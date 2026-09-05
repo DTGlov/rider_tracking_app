@@ -52,3 +52,25 @@
 - Later add a WebSocket-backed data source without changing the presentation layer.
 - The ViewModel should continue consuming the same tracking stream regardless of source.
 - Replace the simulator with the backend by swapping repository wiring, not by rewriting widgets.
+
+## Phase completion
+
+The project is developed in small vertical phases.
+
+At the end of each phase:
+- ensure the requested phase is complete;
+- run relevant tests and static analysis;
+- inspect git status and git diff;
+- do not begin the next phase automatically;
+- report the completed milestone and stop.
+
+Do not commit or push unless explicitly requested.
+
+## Learning Documentation
+
+- Keep concise, phase-based learning notes in `docs/learning/`.
+- Add or update one numbered Markdown file for each completed development phase.
+- Explain the purpose, architecture, communication flow, important decisions, relevant files, deferred work, and key lessons.
+- Document the system at the feature and component level; do not describe every method or line of code.
+- Use repository-relative file references and small Mermaid diagrams when they improve understanding.
+- Update the learning notes when a later phase changes an earlier architectural decision.
