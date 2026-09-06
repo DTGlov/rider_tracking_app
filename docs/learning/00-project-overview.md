@@ -19,7 +19,7 @@ flowchart LR
   VM --> UI[TrackingPage]
 ```
 
-Today, the data source is `LocalTrackingSimulator`. Later, a WebSocket data source can provide the same kind of tracking snapshots. The repository contract and ViewModel stream should remain stable, so the UI does not need to know which source is active.
+The default data source is `LocalTrackingSimulator`. A WebSocket data source now provides the same kind of tracking snapshots behind a second repository implementation. The repository contract and ViewModel stream remain stable, so the UI does not need to know which source is active.
 
 ## Development progress
 
@@ -29,8 +29,9 @@ Today, the data source is `LocalTrackingSimulator`. Later, a WebSocket data sour
 4. Live rider movement UX: complete. Marker movement is interpolated and the map can follow or recenter on the rider.
 5. Tracking experience UI: complete. The map now has a polished delivery status, rider identity, ETA, distance, and progress panel.
 6. Phase 6A WebSocket contract and Go server: complete. A separate Go simulator emits deterministic tracking JSON over `/ws/tracking`; Flutter integration remains deferred.
-7. Phase 6B Flutter WebSocket source: later. Add a WebSocket-backed data source behind the existing repository contract.
-8. Product hardening: later. Address real authentication, connection failures, persistence, platform location concerns, and production observability.
+7. Phase 6B Flutter WebSocket source: complete. A strict WebSocket DTO, transport data source, and repository implementation now coexist with the local source; local wiring remains the default.
+8. Phase 6C source selection and resilience: later. Add deliberate runtime source selection, stale-message handling, reconnects, and production connection behavior.
+9. Product hardening: later. Address real authentication, persistence, platform location concerns, and production observability.
 
 ## Important boundary
 
