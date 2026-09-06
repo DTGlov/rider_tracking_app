@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rider_tracking_app/app/app.dart';
 
@@ -14,5 +15,13 @@ void main() {
     expect(find.text('ETA'), findsOneWidget);
     expect(find.text('Remaining distance'), findsOneWidget);
     expect(find.text('Rider Tracking'), findsWidgets);
+    expect(find.text('Dobz'), findsOneWidget);
+    expect(find.text('Your rider'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('delivery-status-message')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('delivery-progress')), findsOneWidget);
+    expect(find.byKey(const ValueKey('tracking-map')), findsOneWidget);
   });
 }

@@ -228,7 +228,7 @@ class _TrackingMapState extends State<TrackingMap>
         ),
         if (!_followEnabled)
           Align(
-            alignment: Alignment.bottomRight,
+            alignment: Alignment.topRight,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: FloatingActionButton.small(
