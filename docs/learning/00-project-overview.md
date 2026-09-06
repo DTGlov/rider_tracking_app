@@ -30,8 +30,8 @@ The default data source is `LocalTrackingSimulator`. A WebSocket data source now
 5. Tracking experience UI: complete. The map now has a polished delivery status, rider identity, ETA, distance, and progress panel.
 6. Phase 6A WebSocket contract and Go server: complete. A separate Go simulator emits deterministic tracking JSON over `/ws/tracking`; Flutter integration remains deferred.
 7. Phase 6B Flutter WebSocket source: complete. A strict WebSocket DTO, transport data source, and repository implementation now coexist with the local source; local wiring remains the default.
-8. Phase 6C source selection and resilience: later. Add deliberate runtime source selection, stale-message handling, reconnects, and production connection behavior.
-9. Product hardening: later. Address real authentication, persistence, platform location concerns, and production observability.
+8. Phase 6C runtime source selection: complete. Compile-time configuration can select the local simulator or Go WebSocket repository at the app composition root; local remains the default.
+9. Phase 7 resilience and product hardening: later. Add stale-message handling, reconnects, authentication, persistence, platform location concerns, and production observability.
 
 ## Important boundary
 
@@ -40,6 +40,8 @@ The current page is still intentionally simple. It proves that updates reach a m
 ## Files to know
 
 - `lib/app/app.dart` creates the repository and ViewModel and starts the app.
+- `lib/app/tracking_source_config.dart` parses compile-time source configuration.
+- `lib/app/tracking_composition.dart` selects the repository implementation.
 - `lib/app/router.dart` maps the tracking route to the tracking page.
 - `lib/features/tracking/domain/repositories/tracking_repository.dart` defines the source-independent tracking stream.
 - `lib/features/tracking/data/datasources/local_tracking_simulator.dart` creates local tracking snapshots.

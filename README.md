@@ -17,6 +17,7 @@ The following development phases are complete:
 5. **Tracking experience UI**: polished delivery status, Dobz rider identity, human-friendly metrics, and delivery progress.
 6. **WebSocket contract and Go server**: a minimal deterministic Go server emits the documented tracking JSON contract over `/ws/tracking`.
 7. **Flutter WebSocket data source**: strict JSON decoding and a WebSocket-backed repository now satisfy the existing tracking contract; local simulator wiring remains the default.
+8. **Runtime source selection**: compile-time configuration can select either repository at the app composition root; local mode remains the default.
 
 ## Architecture
 
@@ -92,4 +93,4 @@ Screenshots and demo media will be added here when the UI and visual direction a
 
 The local tracking experience is functional and suitable for demonstrating the current product direction. The simulator, map, movement UX, delivery information panel, focused tests, Go WebSocket server, and optional Flutter WebSocket source are in place. The local simulator remains the default app source.
 
-The next planned milestone is explicit source selection and connection resilience. Production concerns such as authentication, connection recovery, persistence, device location, backend business logic, routing, notifications, and production tile configuration remain intentionally unimplemented.
+The next planned milestone is connection resilience. Production concerns such as authentication, reconnect/recovery, stale-message handling, persistence, device location, backend business logic, routing, notifications, and production tile configuration remain intentionally unimplemented.
