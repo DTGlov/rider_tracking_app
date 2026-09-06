@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import '../../domain/models/geo_coordinate.dart';
+import '../../domain/models/tracking_route.dart';
 import '../../domain/models/tracking_snapshot.dart';
 import '../../domain/models/tracking_status.dart';
 import 'tracking_simulation_driver.dart';
@@ -15,7 +16,7 @@ class LocalTrackingSimulator {
     DateTime? startTime,
   }) : _driver =
            driver ?? PeriodicTrackingSimulationDriver(interval: tickInterval),
-       _route = route ?? _defaultRoute,
+       _route = route ?? defaultTrackingRoute,
        _tickInterval = tickInterval,
        _speedMetersPerSecond = speedMetersPerSecond,
        _startTime = startTime ?? DateTime.utc(2026, 9, 5, 12) {
@@ -23,14 +24,6 @@ class LocalTrackingSimulator {
       throw ArgumentError.value(_route, 'route', 'needs at least two points');
     }
   }
-
-  static const List<GeoCoordinate> _defaultRoute = [
-    GeoCoordinate(latitude: 5.6037, longitude: -0.1870),
-    GeoCoordinate(latitude: 5.6045, longitude: -0.1857),
-    GeoCoordinate(latitude: 5.6056, longitude: -0.1844),
-    GeoCoordinate(latitude: 5.6064, longitude: -0.1831),
-    GeoCoordinate(latitude: 5.6072, longitude: -0.1819),
-  ];
 
   final TrackingSimulationDriver _driver;
   final List<GeoCoordinate> _route;

@@ -24,14 +24,14 @@ Today, the data source is `LocalTrackingSimulator`. Later, a WebSocket data sour
 ## Development progress
 
 1. Foundation: complete. The app shell, routing, theme, domain models, repository contract, Provider wiring, and initial ViewModel exist.
-2. Local rider simulation: complete. A deterministic route emits snapshots, and the temporary page displays live diagnostic values.
-3. Map tracking: next. Add map rendering, rider position, destination, and route presentation.
+2. Local rider simulation: complete. A deterministic route emits snapshots, and the page displays live tracking values.
+3. Map tracking: complete. The page renders the route, rider position, and destination on a map.
 4. Real data source: later. Replace or select the local simulator through repository wiring and add a WebSocket-backed source.
 5. Product hardening: later. Address real authentication, connection failures, persistence, platform location concerns, and production observability.
 
 ## Important boundary
 
-The current page is intentionally diagnostic. It proves that updates reach the UI, but it is not yet the final customer tracking experience.
+The current page is still intentionally simple. It proves that updates reach a map and status overlay, but it is not yet the final customer tracking experience.
 
 ## Files to know
 
@@ -41,7 +41,7 @@ The current page is intentionally diagnostic. It proves that updates reach the U
 - `lib/features/tracking/data/datasources/local_tracking_simulator.dart` creates local tracking snapshots.
 - `lib/features/tracking/data/repositories/local_tracking_repository.dart` exposes the simulator through the domain contract.
 - `lib/features/tracking/presentation/view_models/tracking_view_model.dart` turns stream events into immutable presentation state.
-- `lib/features/tracking/presentation/pages/tracking_page.dart` renders the current diagnostic state.
+- `lib/features/tracking/presentation/pages/tracking_page.dart` renders the map and current tracking state.
 
 ## Remember
 

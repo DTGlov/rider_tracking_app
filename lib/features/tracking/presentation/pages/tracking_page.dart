@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../domain/models/tracking_route.dart';
 import '../../domain/models/tracking_status.dart';
+import '../widgets/tracking_map.dart';
 import '../view_models/tracking_view_model.dart';
 
 class TrackingPage extends StatelessWidget {
@@ -20,71 +22,85 @@ class TrackingPage extends StatelessWidget {
             builder: (BuildContext context, Widget? child) {
               final state = viewModel.state;
 
-              return ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Live simulator diagnostics',
-                            style: Theme.of(context).textTheme.headlineSmall,
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  TrackingMap(
+                    route: defaultTrackingRoute,
+                    destination: state.destination ?? defaultTrackingRoute.last,
+                    riderLocation: state.riderLocation,
+                  ),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 520),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Live simulator diagnostics',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  state.isLoading
+                                      ? 'Waiting for the first simulated snapshot...'
+                                      : state.isComplete
+                                      ? 'Rider has reached the destination.'
+                                      : 'Rider is moving along the predefined route.',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: 16),
+                                _DiagnosticRow(
+                                  label: 'Latitude',
+                                  value: state.riderLocation == null
+                                      ? '--'
+                                      : state.riderLocation!.latitude
+                                            .toStringAsFixed(6),
+                                ),
+                                const SizedBox(height: 8),
+                                _DiagnosticRow(
+                                  label: 'Longitude',
+                                  value: state.riderLocation == null
+                                      ? '--'
+                                      : state.riderLocation!.longitude
+                                            .toStringAsFixed(6),
+                                ),
+                                const SizedBox(height: 8),
+                                _DiagnosticRow(
+                                  label: 'Status',
+                                  value: state.status.label,
+                                ),
+                                const SizedBox(height: 8),
+                                _DiagnosticRow(
+                                  label: 'ETA',
+                                  value: state.eta == null
+                                      ? '--'
+                                      : _formatDuration(state.eta!),
+                                ),
+                                const SizedBox(height: 8),
+                                _DiagnosticRow(
+                                  label: 'Remaining distance',
+                                  value: state.remainingDistanceMeters == null
+                                      ? '--'
+                                      : '${state.remainingDistanceMeters!.toStringAsFixed(1)} m',
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            state.isLoading
-                                ? 'Waiting for the first simulated snapshot...'
-                                : state.isComplete
-                                ? 'Simulation has reached the destination.'
-                                : 'Simulation is running without user interaction.',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 20),
-                          _DiagnosticRow(
-                            label: 'Latitude',
-                            value: state.riderLocation == null
-                                ? '--'
-                                : state.riderLocation!.latitude.toStringAsFixed(
-                                    6,
-                                  ),
-                          ),
-                          const SizedBox(height: 8),
-                          _DiagnosticRow(
-                            label: 'Longitude',
-                            value: state.riderLocation == null
-                                ? '--'
-                                : state.riderLocation!.longitude
-                                      .toStringAsFixed(6),
-                          ),
-                          const SizedBox(height: 8),
-                          _DiagnosticRow(
-                            label: 'Status',
-                            value: state.status.label,
-                          ),
-                          const SizedBox(height: 8),
-                          _DiagnosticRow(
-                            label: 'ETA',
-                            value: state.eta == null
-                                ? '--'
-                                : _formatDuration(state.eta!),
-                          ),
-                          const SizedBox(height: 8),
-                          _DiagnosticRow(
-                            label: 'Remaining distance',
-                            value: state.remainingDistanceMeters == null
-                                ? '--'
-                                : '${state.remainingDistanceMeters!.toStringAsFixed(1)} m',
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               );
             },
           ),

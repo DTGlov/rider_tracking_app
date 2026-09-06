@@ -11,7 +11,7 @@ The second phase added a local rider that moves along a fixed route. It emits `T
 - destination;
 - a deterministic timestamp.
 
-The stream completes when the rider reaches the destination. The page currently shows these values as temporary diagnostic text.
+The stream completes when the rider reaches the destination. The page displays these values in a status overlay and uses the location for map rendering.
 
 ## Why use a fake rider first
 
@@ -43,7 +43,7 @@ sequenceDiagram
 
 `TrackingViewModel` subscribes to the repository stream, stores the latest snapshot as `TrackingViewState`, marks loading and completion, and cancels its subscription when disposed.
 
-`TrackingPage` in `lib/features/tracking/presentation/pages/tracking_page.dart` listens to the ViewModel and displays latitude, longitude, status, ETA, and remaining distance. It contains no route progression logic.
+`TrackingPage` in `lib/features/tracking/presentation/pages/tracking_page.dart` listens to the ViewModel and displays the current map and tracking values. It contains no route progression logic.
 
 ## Deterministic timing
 
@@ -59,7 +59,7 @@ The driver is injected so the production app can run periodically while tests co
 
 ## Deliberately left for later
 
-There is no map widget, route polyline, real GPS input, network call, WebSocket, reconnect policy, or server-authoritative ETA. The route is intentionally predefined and local. The diagnostic page is temporary.
+There is no real GPS input, WebSocket, reconnect policy, or server-authoritative ETA. The route remains predefined and local.
 
 ## Files to know
 
