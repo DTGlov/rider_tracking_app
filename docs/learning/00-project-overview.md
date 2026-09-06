@@ -26,8 +26,9 @@ Today, the data source is `LocalTrackingSimulator`. Later, a WebSocket data sour
 1. Foundation: complete. The app shell, routing, theme, domain models, repository contract, Provider wiring, and initial ViewModel exist.
 2. Local rider simulation: complete. A deterministic route emits snapshots, and the page displays live tracking values.
 3. Map tracking: complete. The page renders the route, rider position, and destination on a map.
-4. Real data source: later. Replace or select the local simulator through repository wiring and add a WebSocket-backed source.
-5. Product hardening: later. Address real authentication, connection failures, persistence, platform location concerns, and production observability.
+4. Live rider movement UX: complete. Marker movement is interpolated and the map can follow or recenter on the rider.
+5. Real data source: later. Replace or select the local simulator through repository wiring and add a WebSocket-backed source.
+6. Product hardening: later. Address real authentication, connection failures, persistence, platform location concerns, and production observability.
 
 ## Important boundary
 

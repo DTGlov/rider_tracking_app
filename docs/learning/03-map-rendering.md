@@ -34,7 +34,7 @@ The map does not know about the simulator or repository. It receives a route, de
 
 ## Intentionally deferred
 
-This phase does not add WebSockets, device geolocation, real routing, Google Directions, backend calls, advanced marker animation, or camera following. Tiles use OpenStreetMap's public tile endpoint for this demonstration; production usage must review tile-service policy and availability.
+This phase does not add WebSockets, device geolocation, real routing, Google Directions, backend calls, advanced marker animation, or camera following. Basic marker interpolation and follow/recenter behavior were added in Phase 4. Tiles use OpenStreetMap's public tile endpoint for this demonstration; production usage must review tile-service policy and availability.
 
 ## What to understand
 

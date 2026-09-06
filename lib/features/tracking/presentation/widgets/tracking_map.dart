@@ -12,7 +12,21 @@ List<LatLng> toMapCoordinates(Iterable<GeoCoordinate> coordinates) {
   return coordinates.map(toMapCoordinate).toList(growable: false);
 }
 
-class TrackingMap extends StatelessWidget {
+GeoCoordinate interpolateCoordinate(
+  GeoCoordinate start,
+  GeoCoordinate end,
+  double progress,
+) {
+  final clampedProgress = progress.clamp(0.0, 1.0);
+  return GeoCoordinate(
+    latitude:
+        start.latitude + (end.latitude - start.latitude) * clampedProgress,
+    longitude:
+        start.longitude + (end.longitude - start.longitude) * clampedProgress,
+  );
+}
+
+class TrackingMap extends StatefulWidget {
   const TrackingMap({
     required this.route,
     required this.destination,
@@ -25,8 +39,112 @@ class TrackingMap extends StatelessWidget {
   final GeoCoordinate? riderLocation;
 
   @override
+  State<TrackingMap> createState() => _TrackingMapState();
+}
+
+class _TrackingMapState extends State<TrackingMap>
+    with SingleTickerProviderStateMixin {
+  late final MapController _mapController;
+  late final AnimationController _riderAnimation;
+  GeoCoordinate? _animationStart;
+  GeoCoordinate? _animationTarget;
+  GeoCoordinate? _displayedRiderLocation;
+  var _followEnabled = true;
+  var _mapReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+    _riderAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    )..addListener(_handleAnimationTick);
+    _displayedRiderLocation = widget.riderLocation;
+  }
+
+  @override
+  void didUpdateWidget(covariant TrackingMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final nextLocation = widget.riderLocation;
+    if (nextLocation == oldWidget.riderLocation) {
+      return;
+    }
+
+    if (nextLocation == null) {
+      _riderAnimation.stop();
+      _displayedRiderLocation = null;
+      _animationStart = null;
+      _animationTarget = null;
+      return;
+    }
+
+    final currentLocation = _displayedRiderLocation;
+    if (currentLocation == null) {
+      _displayedRiderLocation = nextLocation;
+      return;
+    }
+
+    _animationStart = currentLocation;
+    _animationTarget = nextLocation;
+    _riderAnimation
+      ..stop()
+      ..value = 0
+      ..forward();
+  }
+
+  @override
+  void dispose() {
+    _riderAnimation.dispose();
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  void _handleAnimationTick() {
+    final start = _animationStart;
+    final target = _animationTarget;
+    if (!mounted || start == null || target == null) {
+      return;
+    }
+
+    final location = interpolateCoordinate(
+      start,
+      target,
+      Curves.easeOut.transform(_riderAnimation.value),
+    );
+    setState(() => _displayedRiderLocation = location);
+    _followRider(location);
+  }
+
+  void _followRider(GeoCoordinate location) {
+    if (_followEnabled && _mapReady) {
+      _mapController.move(
+        toMapCoordinate(location),
+        _mapController.camera.zoom,
+      );
+    }
+  }
+
+  void _handleMapPositionChanged(MapCamera camera, bool hasGesture) {
+    if (hasGesture && _followEnabled) {
+      setState(() => _followEnabled = false);
+    }
+  }
+
+  void _recenterAndFollow() {
+    setState(() => _followEnabled = true);
+    final location = _displayedRiderLocation;
+    if (location != null && _mapReady) {
+      _mapController.move(
+        toMapCoordinate(location),
+        _mapController.camera.zoom,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final routePoints = toMapCoordinates(route);
+    final routePoints = toMapCoordinates(widget.route);
     final markers = <Marker>[
       Marker(
         key: const ValueKey('origin-marker'),
@@ -41,7 +159,7 @@ class TrackingMap extends StatelessWidget {
       ),
       Marker(
         key: const ValueKey('destination-marker'),
-        point: toMapCoordinate(destination),
+        point: toMapCoordinate(widget.destination),
         width: 36,
         height: 36,
         child: const _MapMarker(
@@ -52,7 +170,7 @@ class TrackingMap extends StatelessWidget {
       ),
     ];
 
-    final rider = riderLocation;
+    final rider = _displayedRiderLocation;
     if (rider != null) {
       markers.add(
         Marker(
@@ -69,33 +187,58 @@ class TrackingMap extends StatelessWidget {
       );
     }
 
-    return FlutterMap(
-      key: const ValueKey('tracking-map'),
-      options: MapOptions(
-        initialCameraFit: CameraFit.coordinates(
-          coordinates: routePoints,
-          padding: const EdgeInsets.all(56),
-          maxZoom: 16,
-        ),
-      ),
+    return Stack(
+      fit: StackFit.expand,
       children: [
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.example.rider_tracking_app',
-        ),
-        PolylineLayer(
-          polylines: [
-            Polyline(
-              points: routePoints,
-              color: Theme.of(context).colorScheme.primary,
-              strokeWidth: 5,
+        Positioned.fill(
+          child: FlutterMap(
+            key: const ValueKey('tracking-map'),
+            mapController: _mapController,
+            options: MapOptions(
+              initialCameraFit: CameraFit.coordinates(
+                coordinates: routePoints,
+                padding: const EdgeInsets.all(56),
+                maxZoom: 16,
+              ),
+              onMapReady: () => setState(() => _mapReady = true),
+              onPositionChanged: _handleMapPositionChanged,
             ),
-          ],
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.rider_tracking_app',
+              ),
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: routePoints,
+                    color: Theme.of(context).colorScheme.primary,
+                    strokeWidth: 5,
+                  ),
+                ],
+              ),
+              MarkerLayer(markers: markers),
+              const RichAttributionWidget(
+                attributions: [
+                  TextSourceAttribution('OpenStreetMap contributors'),
+                ],
+              ),
+            ],
+          ),
         ),
-        MarkerLayer(markers: markers),
-        const RichAttributionWidget(
-          attributions: [TextSourceAttribution('OpenStreetMap contributors')],
-        ),
+        if (!_followEnabled)
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: FloatingActionButton.small(
+                key: const ValueKey('recenter-follow-button'),
+                onPressed: _recenterAndFollow,
+                tooltip: 'Follow rider',
+                child: const Icon(Icons.my_location),
+              ),
+            ),
+          ),
       ],
     );
   }
